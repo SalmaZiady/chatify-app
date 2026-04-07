@@ -30,8 +30,15 @@ export const signup = async (req,res) =>{
         password: hashedPassword
     });
     if(newUser){
-        generateToken(newUser._id, res); // authenticate the user
-        await newUser.save();
+        // before CR:
+        // generateToken(newUser._id, res); // authenticate the user
+        // await newUser.save();
+
+        // after CR:
+        // Persist the user first, then issue auth cookie
+        const savedUser = await newUser.save();
+        generateToken(savedUser._id, res); // authenticate the user after saving
+
         res.status(201).json({
             _id: newUser._id,
             fullName: newUser.fullName,
